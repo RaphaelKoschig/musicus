@@ -26,50 +26,31 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.raphko.musicus.R
-import com.raphko.musicus.model.Album
-import com.raphko.musicus.model.Artist
 import com.raphko.musicus.ui.theme.MusicusTheme
 import com.raphko.musicus.ui.viewmodel.ArtistViewModel
 
 // Show the details of Artist with 1st album and its tracks
 @Composable
 fun ArtistDetailScreen(
-    viewModel: ArtistViewModel, artistId: Long,
+    viewModel: ArtistViewModel = ArtistViewModel(), artistId: Long,
     navigateUp: (ArtistViewModel) -> Unit,
 ) {
-    val artist by viewModel.artist.collectAsState()
-    val firstAlbum by viewModel.firstAlbum.collectAsState()
-    val artistLoaded by viewModel.artistLoaded.collectAsState()
-    val albumLoaded by viewModel.albumLoaded.collectAsState()
-    val noAlbum by viewModel.noAlbum.collectAsState()
+    viewModel.loadArtistAndAlbum(artistId)
 
-    if (!artistLoaded && !albumLoaded) {
-        viewModel.loadArtistAndAlbum(artistId)
-    }
     Column() {
-        ArtistHeader(viewModel, artist, navigateUp)
-        when {
-            !albumLoaded && !artistLoaded -> Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.White),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LoaderUi()
-            }
-            else -> ArtistAlbum(viewModel, artist = artist, album = firstAlbum)
-        }
+        ArtistHeader(viewModel, navigateUp)
+        ArtistAlbum(viewModel)
     }
 }
 
 // Show up button, banner of the artist, custom app bar.
 @Composable
 private fun ArtistHeader(
-    artistViewModel: ArtistViewModel,
-    artist: Artist,
+    viewModel: ArtistViewModel,
     navigateUp: (ArtistViewModel) -> Unit
 ) {
+    val artist by viewModel.artist.collectAsState()
+
     Box {
         TopAppBar(
             backgroundColor = MaterialTheme.colors.primaryVariant,
@@ -82,7 +63,7 @@ private fun ArtistHeader(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth(0.1f),
             ) {
-                IconButton(onClick = { navigateUp(artistViewModel) }) {
+                IconButton(onClick = { navigateUp(viewModel) }) {
                     Icon(
                         imageVector = Icons.Rounded.ArrowBack,
                         contentDescription = "Back"
@@ -132,7 +113,9 @@ private fun ArtistHeader(
 
 // Section for Album and tracks
 @Composable
-private fun ArtistAlbum(viewModel: ArtistViewModel, artist: Artist, album: Album) {
+private fun ArtistAlbum(viewModel: ArtistViewModel) {
+    val artist by viewModel.artist.collectAsState()
+    val album by viewModel.firstAlbum.collectAsState()
     val tracksLoaded by viewModel.tracksLoaded.collectAsState()
     val trackList by viewModel.trackList.collectAsState()
     Column() {

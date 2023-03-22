@@ -1,17 +1,16 @@
 package com.raphko.musicus.model
 
-import kotlinx.serialization.*
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class Artist(
-    @SerialName("id")
+    @SerializedName("id")
     val id: Long,
-    @SerialName("name")
+    @SerializedName("name")
     val name: String,
-    @SerialName("picture_small")
+    @SerializedName("picture_small")
     val pictureSmall: String,
-    @SerialName("picture_medium")
+    @SerializedName("picture_medium")
     val pictureMedium: String,
-    @SerialName("picture_big")
+    @SerializedName("picture_big")
     val pictureBig: String
 )

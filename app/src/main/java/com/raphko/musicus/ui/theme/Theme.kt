@@ -40,11 +40,11 @@ fun MusicusTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
     }
 
     val systemUiController = rememberSystemUiController()
-    if(darkTheme){
+    if (darkTheme) {
         systemUiController.setSystemBarsColor(
             color = VividTeal
         )
-    }else{
+    } else {
         systemUiController.setSystemBarsColor(
             color = DarkTeal
         )

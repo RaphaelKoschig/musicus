@@ -28,12 +28,19 @@ import com.raphko.musicus.utils.MusicusMediaPlayer
 
 @Composable
 fun TracklistUi(tracks: List<Track>) {
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         itemsIndexed(tracks) { index, track ->
             val paddingTop = if (index == 0) 30.dp else 10.dp
             Row(
-                modifier = Modifier.padding(start = 30.dp, end = 30.dp, top = paddingTop, bottom = 10.dp)
+                modifier = Modifier.padding(
+                    start = 30.dp,
+                    end = 30.dp,
+                    top = paddingTop,
+                    bottom = 10.dp
+                )
             ) {
                 TrackCard(
                     track,
@@ -79,7 +86,7 @@ private fun TrackCard(track: Track, index: Int) {
 fun PreviewTrackListUi() {
     MusicusTheme() {
         TracklistUi(
-            ArtistViewModel.artistAlbumPreview.tracks
+            ArtistViewModel.artistAlbumPreview.tracks.tracks
         )
     }
 }

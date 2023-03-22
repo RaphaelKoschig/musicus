@@ -1,11 +1,11 @@
 package com.raphko.musicus.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raphko.musicus.data.ArtistsRepository
 import com.raphko.musicus.model.ArtistMinimal
-import io.ktor.utils.io.errors.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,29 +19,34 @@ class ArtistListViewModel(
     val isLoading: StateFlow<Boolean> = _isLoading
     private val _launchedFirstSearch = MutableStateFlow(false)
     val launchedFirstSearch: StateFlow<Boolean> = _launchedFirstSearch
-    private val _searchTerm = MutableStateFlow("")
-    val searchTerm: StateFlow<String> = _searchTerm
 
-    // Store changeTerme in state
-    fun changeSearchTerm(searchTerm: String) {
-        _searchTerm.value = searchTerm
+    private val errorHandler =
+        CoroutineExceptionHandler { _, exception -> exception.printStackTrace() }
+
+    fun storeArtistsListInCache() {
+        artistsRepository.storeListArtistsInCache(artistsSearchList.value)
+    }
+
+    fun checkArtistsListCache() {
+        val artistsListCache = artistsRepository.getListArtistsInCache()
+        if (!artistsListCache.isEmpty()) {
+            _launchedFirstSearch.value = true
+            _artistsSearchList.value = artistsListCache
+        }
     }
 
     // Use coroutine to make request to search artists
     fun searchArtists(searchTerm: String) {
-        _launchedFirstSearch.value = true
-        _isLoading.value = true
-        viewModelScope.launch(Dispatchers.IO) {
-
+        viewModelScope.launch(errorHandler) {
+            _launchedFirstSearch.value = true
+            _isLoading.value = true
             try {
-                when (val result = artistsRepository.searchArtists(searchTerm)) {
-                    is List<ArtistMinimal> -> _artistsSearchList.value = result
-                    // TODO Should add a way yo display error, etc
-                    else -> println("No data for this search term")
-                }
+                val artistList = artistsRepository.searchArtists(searchTerm)
+                Log.v("ArtistListModel", "searchArtists: " + artistList.artists)
+                _artistsSearchList.value = artistList.artists
                 _isLoading.value = false
-            } catch (exception: IOException) {
-                println("Failed to search artist")
+            } catch (exception: Exception) {
+                exception.printStackTrace()
             }
         }
     }

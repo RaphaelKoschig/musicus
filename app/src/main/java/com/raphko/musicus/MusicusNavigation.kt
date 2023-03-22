@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.raphko.musicus.ui.viewmodel.ArtistListViewModel
 import com.raphko.musicus.ui.viewmodel.ArtistViewModel
 
 // Navigation controller
@@ -16,26 +15,22 @@ import com.raphko.musicus.ui.viewmodel.ArtistViewModel
 fun MusicusNavigation() {
     val navController = rememberNavController()
     val actions = remember(navController) { AppActions(navController) }
-    // We keep the viewModels in order to always have state after navigation
-    val artistListViewModel = remember { ArtistListViewModel() }
-    val artistViewModel = remember { ArtistViewModel() }
     NavHost(navController = navController, startDestination = "search") {
         composable("search") {
-            artistViewModel.reset()
             ArtistSearchScreen(
-                artistListViewModel,
-                onNavigateToArtistDetail = actions.selectedArtist)
+                onNavigateToArtistDetail = actions.selectedArtist
+            )
         }
-        composable("artistDetail/{artistId}",
+        composable(
+            "artistDetail/{artistId}",
             arguments = listOf(
                 navArgument("artistId") {
                     type = NavType.LongType
-                })) {
-                backStackEntry ->
+                })
+        ) { backStackEntry ->
             val arguments = requireNotNull(backStackEntry.arguments)
             val artistId = arguments.getLong("artistId")
             ArtistDetailScreen(
-                artistViewModel,
                 artistId = artistId,
                 navigateUp = actions.navigateUp
             )

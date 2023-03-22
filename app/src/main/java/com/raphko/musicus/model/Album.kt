@@ -1,16 +1,15 @@
 package com.raphko.musicus.model
 
-import kotlinx.serialization.*
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class Album(
-    @SerialName("id")
+    @SerializedName("id")
     val id: Long,
-    @SerialName("title")
+    @SerializedName("title")
     val title: String,
-    @SerialName("cover_medium")
+    @SerializedName("cover_medium")
     val coverMedium: String,
-    @SerialName("release_date")
+    @SerializedName("release_date")
     val releaseDate: String,
-    var tracks: List<Track> = arrayListOf()
+    val tracks: TrackList
 )

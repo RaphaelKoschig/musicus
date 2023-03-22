@@ -1,13 +1,12 @@
 package com.raphko.musicus.model
 
-import kotlinx.serialization.*
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class Track(
-    @SerialName("id")
+    @SerializedName("id")
     val id: Long,
-    @SerialName("title")
+    @SerializedName("title")
     val title: String,
-    @SerialName("preview")
+    @SerializedName("preview")
     val preview: String
 )
