@@ -2,6 +2,7 @@ package com.raphko.musicus.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,7 +19,8 @@ fun MusicusNavigation() {
     NavHost(navController = navController, startDestination = "search") {
         composable("search") {
             ArtistSearchScreen(
-                onNavigateToArtistDetail = actions.selectedArtist
+                onNavigateToArtistDetail = actions.selectedArtist,
+                viewModel()
             )
         }
         composable(

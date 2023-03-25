@@ -22,16 +22,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raphko.musicus.ui.theme.MusicusTheme
 import com.raphko.musicus.ui.viewmodel.ArtistListViewModel
+import com.raphko.musicus.ui.viewmodel.ArtistListViewModelAbstract
+import com.raphko.musicus.ui.viewmodel.ArtistListViewModelPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 @Composable
-fun ArtistSearchScreen(onNavigateToArtistDetail: (Long) -> Unit) {
+fun ArtistSearchScreen(onNavigateToArtistDetail: (Long) -> Unit, viewModel: ArtistListViewModelAbstract) {
     val focusRequester = remember { FocusRequester() }
     val textState = remember { mutableStateOf(TextFieldValue("")) }
-    val viewModel:ArtistListViewModel = viewModel()
-    //val artistsSearchList by viewModel.artistsSearchList.collectAsState()
-    //val isLoading by viewModel.isLoading.collectAsState()
-    //val launchedFirstSearch by viewModel.launchedFirstSearch.collectAsState()
+    val viewModel = viewModel
     Column {
         SearchView(viewModel, textState, focusRequester)
         Spacer(modifier = Modifier.height(4.dp))
@@ -41,7 +41,7 @@ fun ArtistSearchScreen(onNavigateToArtistDetail: (Long) -> Unit) {
 
 @Composable
 fun SearchView(
-    viewModel: ArtistListViewModel,
+    viewModel: ArtistListViewModelAbstract,
     state: MutableState<TextFieldValue>,
     focusRequester: FocusRequester
 ) {
@@ -105,6 +105,11 @@ fun SearchView(
 @Composable
 fun ArtistSearchScreenPreview() {
     MusicusTheme {
-        ArtistSearchScreen(onNavigateToArtistDetail = {})
+        ArtistSearchScreen(onNavigateToArtistDetail = {},
+            ArtistListViewModelPreview(
+                isLoading = MutableStateFlow(false),
+                launchedFirstSearch = MutableStateFlow(true),
+                artistsSearchList = MutableStateFlow(ArtistListViewModel.artistSeachListPreview)
+        ))
     }
 }

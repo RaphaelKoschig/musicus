@@ -6,32 +6,43 @@ import androidx.lifecycle.viewModelScope
 import com.raphko.musicus.data.ArtistsRepository
 import com.raphko.musicus.model.ArtistMinimal
 import androidx.lifecycle.SavedStateHandle
+import com.raphko.musicus.ui.viewmodel.ArtistListViewModel.Companion.artistSeachListPreview
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+abstract class ArtistListViewModelAbstract: ViewModel() {
+    abstract val artistsSearchList: StateFlow<List<ArtistMinimal>>
+    abstract val isLoading: StateFlow<Boolean>
+    abstract val launchedFirstSearch: StateFlow<Boolean>
+
+    abstract fun searchArtists(searchTerm: String)
+    abstract fun storeArtistsListInCache()
+    abstract fun checkArtistsListCache()
+}
+
 class ArtistListViewModel(
     private val stateHandle: SavedStateHandle
-) : ViewModel() {
+) : ArtistListViewModelAbstract() {
     private val artistsRepository: ArtistsRepository = ArtistsRepository()
-    private val _artistsSearchList = MutableStateFlow(emptyList<ArtistMinimal>())
-    val artistsSearchList: StateFlow<List<ArtistMinimal>> = _artistsSearchList
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
-    private val _launchedFirstSearch = MutableStateFlow(false)
-    val launchedFirstSearch: StateFlow<Boolean> = _launchedFirstSearch
-
-    private var useCache: Boolean = true
-
     private val errorHandler =
         CoroutineExceptionHandler { _, exception -> exception.printStackTrace() }
+    private var useCache: Boolean = true
 
-    fun storeArtistsListInCache() {
+    // States Flow
+    private val _artistsSearchList = MutableStateFlow(emptyList<ArtistMinimal>())
+    override val artistsSearchList: StateFlow<List<ArtistMinimal>> = _artistsSearchList
+    private val _isLoading = MutableStateFlow(true)
+    override val isLoading: StateFlow<Boolean> = _isLoading
+    private val _launchedFirstSearch = MutableStateFlow(false)
+    override val launchedFirstSearch: StateFlow<Boolean> = _launchedFirstSearch
+
+    override fun storeArtistsListInCache() {
         stateHandle[ARTISTS_LIST] = artistsSearchList.value
     }
 
-    fun checkArtistsListCache() {
+    override fun checkArtistsListCache() {
         val storeArtistsList = stateHandle.get<List<ArtistMinimal>?>(ARTISTS_LIST)
         if (storeArtistsList != null) {
             if (!storeArtistsList.isEmpty() && useCache) {
@@ -42,7 +53,7 @@ class ArtistListViewModel(
     }
 
     // Use coroutine to make request to search artists
-    fun searchArtists(searchTerm: String) {
+    override fun searchArtists(searchTerm: String) {
         viewModelScope.launch(errorHandler) {
             useCache = false
             _launchedFirstSearch.value = true
@@ -75,8 +86,17 @@ class ArtistListViewModel(
                 )
             )
     }
+}
 
-    fun loadArtistsListPreview() {
-        _artistsSearchList.value = artistSeachListPreview
-    }
+class ArtistListViewModelPreview(
+    override val artistsSearchList: StateFlow<List<ArtistMinimal>> = MutableStateFlow(emptyList<ArtistMinimal>()),
+    override val isLoading: StateFlow<Boolean> = MutableStateFlow(true),
+    override val launchedFirstSearch: StateFlow<Boolean> = MutableStateFlow(false)
+) : ArtistListViewModelAbstract() {
+
+    override fun storeArtistsListInCache() {}
+
+    override fun checkArtistsListCache() {}
+
+    override fun searchArtists(searchTerm: String) {}
 }

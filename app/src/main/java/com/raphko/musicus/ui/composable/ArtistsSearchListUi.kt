@@ -37,11 +37,13 @@ import com.raphko.musicus.R
 import com.raphko.musicus.model.ArtistMinimal
 import com.raphko.musicus.ui.theme.MusicusTheme
 import com.raphko.musicus.ui.viewmodel.ArtistListViewModel
+import com.raphko.musicus.ui.viewmodel.ArtistListViewModelAbstract
+import com.raphko.musicus.ui.viewmodel.ArtistListViewModelPreview
 
 @Composable
 fun ArtistsSearchListContainer(
     state: MutableState<TextFieldValue>,
-    viewModel: ArtistListViewModel, onNavigateToArtistDetail: (Long) -> Unit
+    viewModel: ArtistListViewModelAbstract, onNavigateToArtistDetail: (Long) -> Unit
 ) {
     viewModel.checkArtistsListCache()
     val artistsSearchList by viewModel.artistsSearchList.collectAsState()
@@ -108,7 +110,7 @@ fun ArtistsSearchListContainer(
 fun ArtistsSearchListUi(
     artistsSearchList: List<ArtistMinimal>,
     onNavigateToArtistDetail: (Long) -> Unit,
-    viewModel: ArtistListViewModel
+    viewModel: ArtistListViewModelAbstract
 ) {
     if (!artistsSearchList.isEmpty()) {
         LazyColumn(
@@ -150,7 +152,7 @@ fun ArtistsSearchListUi(
 private fun ArtistCard(
     artist: ArtistMinimal,
     onNavigateToArtistDetail: (Long) -> Unit,
-    viewModel: ArtistListViewModel
+    viewModel: ArtistListViewModelAbstract
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -198,7 +200,7 @@ private fun ArtistCard(
 @Preview
 @Composable
 fun PreviewArtistsSearchListUi() {
-    val viewModel:ArtistListViewModel = viewModel()
+    val viewModel:ArtistListViewModelPreview = viewModel()
     MusicusTheme() {
         ArtistsSearchListUi(
             ArtistListViewModel.artistSeachListPreview,
