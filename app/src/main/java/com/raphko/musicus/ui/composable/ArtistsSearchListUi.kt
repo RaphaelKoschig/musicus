@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.raphko.musicus.R
@@ -197,11 +198,12 @@ private fun ArtistCard(
 @Preview
 @Composable
 fun PreviewArtistsSearchListUi() {
+    val viewModel:ArtistListViewModel = viewModel()
     MusicusTheme() {
         ArtistsSearchListUi(
             ArtistListViewModel.artistSeachListPreview,
             onNavigateToArtistDetail = {},
-            ArtistListViewModel()
+            viewModel
         )
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.raphko.musicus.ui.theme.MusicusTheme
 import com.raphko.musicus.ui.viewmodel.ArtistListViewModel
 
@@ -27,7 +28,7 @@ import com.raphko.musicus.ui.viewmodel.ArtistListViewModel
 fun ArtistSearchScreen(onNavigateToArtistDetail: (Long) -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val textState = remember { mutableStateOf(TextFieldValue("")) }
-    val viewModel = ArtistListViewModel()
+    val viewModel:ArtistListViewModel = viewModel()
     //val artistsSearchList by viewModel.artistsSearchList.collectAsState()
     //val isLoading by viewModel.isLoading.collectAsState()
     //val launchedFirstSearch by viewModel.launchedFirstSearch.collectAsState()
@@ -44,12 +45,10 @@ fun SearchView(
     state: MutableState<TextFieldValue>,
     focusRequester: FocusRequester
 ) {
-    //val textState by viewModel.searchTerm.collectAsState()
     TextField(
         value = state.value,
         onValueChange = { value ->
             state.value = value
-            //viewModel.changeSearchTerm(value)
             if (value.text.isNotEmpty()) {
                 viewModel.searchArtists(value.text)
             }
@@ -105,8 +104,6 @@ fun SearchView(
 @Preview(showBackground = true)
 @Composable
 fun ArtistSearchScreenPreview() {
-    val viewModel = ArtistListViewModel()
-    viewModel.loadArtistsListPreview()
     MusicusTheme {
         ArtistSearchScreen(onNavigateToArtistDetail = {})
     }

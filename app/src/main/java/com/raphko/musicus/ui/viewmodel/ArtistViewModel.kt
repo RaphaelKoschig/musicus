@@ -37,16 +37,6 @@ class ArtistViewModel(
     val firstAlbum: StateFlow<Album> = _firstAlbum
     private val _trackList = MutableStateFlow(emptyList<Track>())
     val trackList: StateFlow<List<Track>> = _trackList
-    private val _artistLoaded = MutableStateFlow(false)
-    val artistLoaded: StateFlow<Boolean> = _artistLoaded
-    private val _albumLoaded = MutableStateFlow(false)
-    val albumLoaded: StateFlow<Boolean> = _albumLoaded
-    private val _noAlbum = MutableStateFlow(false)
-    val noAlbum: StateFlow<Boolean> = _noAlbum
-    private val _tracksLoaded = MutableStateFlow(false)
-    val tracksLoaded: StateFlow<Boolean> = _tracksLoaded
-    private val _noTrack = MutableStateFlow(false)
-    val noTrack: StateFlow<Boolean> = _noTrack
 
     private val errorHandler =
         CoroutineExceptionHandler { _, exception -> exception.printStackTrace() }
@@ -57,12 +47,9 @@ class ArtistViewModel(
         viewModelScope.launch(errorHandler) {
             try {
                 _artist.value = artistsRepository.getArtist(artistId)
-                _artistLoaded.value = true
                 _firstAlbum.value = artistsRepository.getArtistFirstAlbum(artistId)
-                _albumLoaded.value = true
                 val trackList = artistsRepository.getAlbumTracks(_firstAlbum.value)
                 _trackList.value = trackList.tracks
-                _tracksLoaded.value = true
             } catch (exception: Exception) {
                 exception.printStackTrace()
             }
@@ -112,8 +99,5 @@ class ArtistViewModel(
     fun loadAlbumPreview() {
         _artist.value = artistPreview
         _firstAlbum.value = artistAlbumPreview
-        _artistLoaded.value = true
-        _albumLoaded.value = true
-        _tracksLoaded.value = true
     }
 }

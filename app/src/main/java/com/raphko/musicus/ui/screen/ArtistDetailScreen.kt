@@ -116,7 +116,6 @@ private fun ArtistHeader(
 private fun ArtistAlbum(viewModel: ArtistViewModel) {
     val artist by viewModel.artist.collectAsState()
     val album by viewModel.firstAlbum.collectAsState()
-    val tracksLoaded by viewModel.tracksLoaded.collectAsState()
     val trackList by viewModel.trackList.collectAsState()
     Column() {
         Box(
@@ -185,10 +184,7 @@ private fun ArtistAlbum(viewModel: ArtistViewModel) {
             }
         }
     }
-    // Wait until tracks are loaded to show them
-    when {
-        tracksLoaded -> TracklistUi(tracks = trackList)
-    }
+    TracklistUi(tracks = trackList)
 }
 
 @Preview(showBackground = true)

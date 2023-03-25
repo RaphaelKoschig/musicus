@@ -5,14 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raphko.musicus.data.ArtistsRepository
 import com.raphko.musicus.model.ArtistMinimal
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ArtistListViewModel(
-    private val artistsRepository: ArtistsRepository = ArtistsRepository()
+    private val stateHandle: SavedStateHandle
 ) : ViewModel() {
+    private val artistsRepository: ArtistsRepository = ArtistsRepository()
     private val _artistsSearchList = MutableStateFlow(emptyList<ArtistMinimal>())
     val artistsSearchList: StateFlow<List<ArtistMinimal>> = _artistsSearchList
     private val _isLoading = MutableStateFlow(true)
@@ -20,24 +22,29 @@ class ArtistListViewModel(
     private val _launchedFirstSearch = MutableStateFlow(false)
     val launchedFirstSearch: StateFlow<Boolean> = _launchedFirstSearch
 
+    private var useCache: Boolean = true
+
     private val errorHandler =
         CoroutineExceptionHandler { _, exception -> exception.printStackTrace() }
 
     fun storeArtistsListInCache() {
-        artistsRepository.storeListArtistsInCache(artistsSearchList.value)
+        stateHandle[ARTISTS_LIST] = artistsSearchList.value
     }
 
     fun checkArtistsListCache() {
-        val artistsListCache = artistsRepository.getListArtistsInCache()
-        if (!artistsListCache.isEmpty()) {
-            _launchedFirstSearch.value = true
-            _artistsSearchList.value = artistsListCache
+        val storeArtistsList = stateHandle.get<List<ArtistMinimal>?>(ARTISTS_LIST)
+        if (storeArtistsList != null) {
+            if (!storeArtistsList.isEmpty() && useCache) {
+                _launchedFirstSearch.value = true
+                _artistsSearchList.value = storeArtistsList
+            }
         }
     }
 
     // Use coroutine to make request to search artists
     fun searchArtists(searchTerm: String) {
         viewModelScope.launch(errorHandler) {
+            useCache = false
             _launchedFirstSearch.value = true
             _isLoading.value = true
             try {
@@ -52,6 +59,8 @@ class ArtistListViewModel(
     }
 
     companion object {
+        const val ARTISTS_LIST = "artistsList"
+
         val artistSeachListPreview: List<ArtistMinimal> =
             listOf(
                 ArtistMinimal(
